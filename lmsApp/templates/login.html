@@ -1,0 +1,186 @@
+{% extends 'base.html' %}{% load static %}{% block pageContent %}
+<style>
+    body {
+        background-image:url('{% static "assets/default/img/book.jpg" %}');
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+    
+    main {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: auto;
+    }
+    
+    #logo-img {
+        height: 7em;
+        width: 7em;
+        object-fit: cover;
+        object-position: center center;
+    }
+    
+    #page-title {
+        font-size: 1.5em;
+        color: #f7f7f7;
+        font-family: cursive;
+        text-shadow: 2px 2px 12px #b7652a;
+    }
+    .full-screen-container {
+  height: 100vh;
+  width: 100vw;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+
+    .login-container {
+  background-color: hsla(201, 100%, 6%, 0.6);
+  padding: 50px 30px;
+  min-width: 400px;
+  width: 50%;
+  max-width: 600px;
+  border-color: #b7652a 2px;
+  border-radius: 20px;
+ 
+}
+ 
+.login-title {
+  color: #fff;
+  text-align: center;
+  margin: 0;
+  margin-bottom: 40px;
+  font-size: 1.5em;
+  font-weight: normal;
+}
+ 
+.input-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+ 
+.input-group label {
+  color: #fff;
+  font-weight: lighter;
+  font-size: 1.5em;
+  margin-bottom: 7px;
+}
+ 
+.input-group input {
+  font-size: 1.5em;
+  padding: 0.1em 0.25em;
+  background-color: hsla(201, 100%, 91%, 0.3);
+  border: 1px solid hsl(201, 100%, 6%);
+  outline: none;
+  border-radius: 5px;
+  color: #fff;
+  font-weight: lighter;
+}
+ 
+.input-group input:focus {
+  border: 1px solid hsl(201, 100%, 50%);
+}
+ 
+.login-button {
+  padding: 10px 30px;
+  width: 100%;
+  border-radius: 5px;
+  background: hsla(201, 100%, 50%, 0.1);
+  border: 1px solid hsl(201, 100%, 50%);
+  outline: none;
+  font-size: 1.5em;
+  color: #fff;
+  font-weight: lighter;
+  margin-top: 20px;
+  cursor: pointer;
+}
+ 
+.login-button:hover {
+  background-color: hsla(201, 100%, 50%, 0.3);
+}
+ 
+.login-button:focus {
+  background-color: hsla(201, 100%, 50%, 0.5);
+}
+ 
+</style>
+<div class="full-screen-container">
+    <div class="login-container">
+        <div class="text-center">
+            <img src="{% static 'assets/default/img/logo.jpg' %}" alt="Logo" class="bg-gradient bg-dark bg-opacity-75 rounded-circle padding-0 border" id="logo-img">
+        </div>
+        <h6 class="text-center fw-bolder" id="page-title">{{system_name}}</h6>
+      <form id="login-user" action="" method="post">
+        {% csrf_token %}
+        <div class="input-group">
+          <label>Email</label>
+          <input type="text" autofocus name="username" id="username" required="required" />
+        </div>
+        <div class="input-group">
+          <label>Password</label>
+          <input type="password" autofocus name="password" id="password" required="required"/>
+        </div>
+        <button type="submit" class="login-button">Sign In</button>
+      </form>
+    </div>
+  </div>
+
+
+{% endblock pageContent %} {% block ScriptBlock %}
+<script>
+    $(function() {
+        $('#login-user').submit(function(e) {
+            e.preventDefault();
+            var _this = $(this)
+            $('.err-msg').remove();
+            var el = $('<div>')
+            el.addClass("alert alert-danger err-msg")
+            el.hide()
+            if (_this[0].checkValidity() == false) {
+                _this[0].reportValidity();
+                return false;
+            }
+            start_loader();
+            $.ajax({
+                headers: {
+                    "X-CSRFToken": '{{csrf_token}}'
+                },
+                url: "{% url 'login-user' %}",
+                data: new FormData($(this)[0]),
+                cache: false,
+                contentType: false,
+                processData: false,
+                method: 'POST',
+                type: 'POST',
+                dataType: 'json',
+                error: err => {
+                    console.log(err)
+                    alert("An error occured", 'error');
+                    end_loader();
+                },
+                success: function(resp) {
+                    if (typeof resp == 'object' && resp.status == 'success') {
+                        el.removeClass("alert alert-danger err-msg")
+                        location.href = "{% url 'home-page' %}"
+                    } else if (resp.status == 'failed' && !!resp.msg) {
+                        el.text(resp.msg)
+                    } else {
+                        el.text("An error occured", 'error');
+                        end_loader();
+                        console.err(resp)
+                    }
+                    _this.prepend(el)
+                    el.show('slow')
+                    $("html, body, .modal").scrollTop(0);
+                    end_loader()
+                }
+            })
+        })
+    })
+</script>
+{% endblock ScriptBlock %}
