@@ -2,7 +2,7 @@
 
 <!--Section: Content-->
 <section class="">
-    <h2 class="fw-bolder">Welcome, {{request.user.first_name}}&nbsp;{{request.user.last_name}}!</h2>
+    <h2   class="fw-bolder">Welcome, {{request.user.first_name}}&nbsp;{{request.user.last_name}}!</h2>
     <hr>
     <div class="row justify-content-center">
         <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 px-1 pb-2">
@@ -16,7 +16,7 @@
                             <div class="col-9">
                                 <h1 class="text-end">{{categories|intcomma}}</h2>
                             </div>
-                            <div class="col-12 text-end"><b>Active Categories</b></div>
+                            <div class="col-12 text-end"><b>Available Categories</b></div>
                         </div>
                     </div>
                 </div>
@@ -33,7 +33,7 @@
                             <div class="col-9">
                                 <h1 class="text-end">{{sub_categories|intcomma}}</h2>
                             </div>
-                            <div class="col-12 text-end"><b>Active Sub Categories</b></div>
+                            <div class="col-12 text-end"><b>Available Sub Categories</b></div>
                         </div>
                     </div>
                 </div>
